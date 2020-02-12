@@ -10,6 +10,7 @@ public class Move : MonoBehaviour
     public float jumpSpeed;
 
     private Vector2 position;
+	private bool canJump = true;
 
     void Start()
     {
@@ -17,7 +18,7 @@ public class Move : MonoBehaviour
         position = transform.position;
     }
 
-    void Update()
+    void FixedUpdate()
     {
         updatePosition();
     }
@@ -31,15 +32,15 @@ public class Move : MonoBehaviour
 
     void updatePosition()
     {
-        //Vector2 location = transform.position;
+        Vector2 location = transform.position;
         if (Input.GetKey(KeyCode.LeftArrow) || Input.GetKey(KeyCode.A))
         {
             if (transform.localScale.x > 0)
             {
                 flip();
             }
-            //location.x -= moveSpeed * Time.deltaTime;
-            rb.velocity = Vector2.left * moveSpeed;
+            location.x -= moveSpeed * Time.deltaTime;
+            //rb.velocity = Vector2.left * moveSpeed;
         }
         else if (Input.GetKey(KeyCode.RightArrow) || Input.GetKey(KeyCode.D))
         {
@@ -47,14 +48,23 @@ public class Move : MonoBehaviour
             {
                 flip();
             }
-            //location.x += moveSpeed * Time.deltaTime;
-            rb.velocity = Vector2.right * moveSpeed;
+            location.x += moveSpeed * Time.deltaTime;
+            //rb.velocity = Vector2.right * moveSpeed;
         }
         else if (Input.GetKey(KeyCode.Space) || Input.GetKey(KeyCode.UpArrow) || Input.GetKey(KeyCode.W))
         {
-            //location.y += jumpSpeed * Time.deltaTime;
-            rb.velocity = Vector2.up * jumpSpeed;
+			if (canJump) {
+				//location.y += jumpSpeed * Time.deltaTime;
+				rb.velocity = Vector2.up * jumpSpeed;
+				canJump = false;
+			}
         }
-        //transform.position = location;
+        transform.position = location;
     }
+
+	void OnCollisionEnter2D(Collision2D collision) {
+		if (collision.gameObject.CompareTag("Floor")) {
+			canJump = true;
+		}
+	}
 }
